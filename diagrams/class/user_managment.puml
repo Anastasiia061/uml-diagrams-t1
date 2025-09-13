@@ -1,0 +1,7 @@
+@startuml
+class Customer {
+- name: String
+- email: String
++ placeOrder(): void
+}
+@enduml

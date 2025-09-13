@@ -1,0 +1,12 @@
+@startuml
+'Участники процесса
+actor "Клиент" as client
+participant "Мобильное приложение" as app
+participant "Система транзакций" as auth
+participant "База данных" as db
+client -> app: Запрос на перевод 500 р
+app -> auth: Проверить доступность средств
+auth -> db: Запрос баланса
+db --> auth: Баланс=1000 р
+auth --> app: Средств достаточно
+@enduml
