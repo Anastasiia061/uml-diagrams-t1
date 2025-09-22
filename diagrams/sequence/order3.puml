@@ -1,0 +1,75 @@
+@startuml
+skinparam database { 
+BackgroundColor #FFD700 
+BorderColor Black 
+}
+skinparam actor { 
+BackgroundColor #95C8D8 
+BorderColor Black 
+}
+actor Customer as Customer 
+participant "Web UI" as UI 
+participant "Order Controller" as C 
+participant "Payment Service" as PS 
+database "Data Base" as DB
+participant "Notification server" as NS 
+activate Customer
+group "1. Оформление заказа" 
+  Customer-> UI : Запрос на оформление заказа 
+  activate UI
+  UI-> C : Передача данных заказа
+  activate C
+  C-> DB : Сохранение  деталей заказа
+  activate DB
+  DB [#green]--> C : Заказ сохранен
+  note right : Заказ сохранен в статусе "Ожидание оплаты"
+  deactivate DB
+  end
+group "2. Оплата" 
+  C-> PS : Проведение платежа
+  activate PS
+  alt Успешная оплата
+  PS-[#green]--> C : Результаты платежа 
+  C-[#lightblue]->> NS :  Отправка уведомления
+  C-> DB : Обновление статуса заказа
+  activate DB
+  DB [#green]--> C : Статус сохранен
+  note right : Заказ сохранен в статусе "Оплачен"
+  deactivate DB
+  else Ошибка оплаты
+  PS-[#red]--> C : Ошибки при проведении платежа
+  C-> DB : Обновление статуса заказа
+  activate DB
+  DB [#green]--> C : Статус сохранен
+  note right : Заказ сохранен в статусе "Предварительный"
+  deactivate DB
+  end
+  deactivate PS
+  end
+group "3. Подтверждение заказа" 
+  C--> UI : Детали заказа
+  deactivate C
+  UI--> Customer : Отображение деталей заказа
+  deactivate UI
+end
+group "4. Изменение корзины" 
+  Customer-> UI : Изменение состава корзины
+  activate UI
+  note right : Действия с корзиной: удалить, добавить, изменить кол-во
+  UI--> C : Изменение состава заказа
+  activate C
+  C-> DB : Изменение состава заказа
+  activate DB
+  DB [#green]--> C : Состав заказа обновлен
+  deactivate DB
+  C  --> UI : Уведомление об изменении состава заказа
+  deactivate C
+  UI --> Customer : Отображение обновленного состава заказа
+  deactivate UI
+end
+deactivate Customer 
+group "5. Уведомление менеджера"
+  NS ->> UI :  Отправка уведомления
+  note right : Уведомление менеджера о новом заказе  
+end
+@enduml
