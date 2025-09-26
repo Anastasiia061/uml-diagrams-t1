@@ -1,0 +1,46 @@
+@startuml
+abstract class Payment {
+- amount: Double
+- paymentDate: Date
+- transactionId: String
++ Payment(transactionId: string, amount: double,
+paymentDate: date)
++ getTransactionId(transactionId: string)
++ setPaymentDetails(paymentDate: date, amount: double)
++ processPayment(amount: Double): boolean
++ registerPayment(transactionId: string): boolean
+}
+
+class CashPayment {
+- cashProvided: Double
++ CashPayment(transactionId: string, 
+amount:Double, paymentDate: Date, cashProvided: double)
++ changeCalculation(cashProvided: Double): Double
++ processPayment(amount: Double): boolean
++ registerPayment(transactionId: string): boolean
+}
+
+class CardPayment {
+- cardNumber: String
+- cardHolder: String
+- validityPeriod: Date
+
++ CardPayment (transactionId: string, 
+amount:Double, paymentDate: Date, cardNumber: string)
++ validateCard (cardNumber: string, cardHolder: string,
+validityPeriod: date):boolean
++ processPayment(amount: Double): boolean
++ registerPayment(transactionId: string): boolean
+}
+
+class PaymentManager {
+- List <Payment> payments
++ processAllPayments(amount: Double): boolean
++ registerAllPayments(transactionId: string): boolean 
+}
+
+Payment <|--  CashPayment
+Payment <|--  CardPayment
+PaymentManager <|--  Payment
+
+@enduml
